@@ -1,0 +1,48 @@
+version: '3.2'
+services:
+  php:
+    build: 
+      context: .
+    image: myapp:1.0
+    networks:
+      - frontend
+      - backend
+    environment:
+      - MYSQL_HOST=n-mysql-app
+      - MYSQL_USER=nuser
+      - MYSQL_PASSWORD=npass
+      - MYSQL_DB=myphpappdb
+    volumes:
+      - ./www/:/var/www/html/
+    ports:
+      - "30001:80"
+    container_name: n-php-app
+  mysql:
+    image: mysql:5.7
+    networks:
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=nuser
+      - MYSQL_PASSWORD=npass 
+      - MYSQL_DATABASE=myphpappdb  
+    container_name: n-mysql-app
+    volumes:
+      - ./my-datavolume:/var/lib/mysql   
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    depends_on:
+      - mysql
+    networks:
+      - backend
+    ports:
+      - "30002:80"
+    environment:
+      - PMA_HOST=n-mysql-app
+      - PMA_PORT= 3306
+    volumes:
+      - /sessions
+    container_name: n-phpmyadmin-app
+networks:
+  frontend:
+  backend:
